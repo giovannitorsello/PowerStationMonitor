@@ -17,6 +17,7 @@
 #define OLED_RESET -1       // Reset pin
 
 #include "./classes/config.h"
+#include "./classes/sdcard.h"
 #include "./classes/webguiserver.h"
 #include "./classes/screen.h"
 #include "./classes/thermometer.h"
@@ -24,6 +25,7 @@
 #define LED 2
 
 Config *cnf = 0;
+SdCard *sd = 0;
 WebGuiServer *srv = 0;
 Screen *sc = 0;
 Thermometer *th = 0;
@@ -36,6 +38,7 @@ void setup()
   Wire.begin(I2C_SDA, I2C_SCL); // Start i2C
 
   cnf = new Config();
+  sd = new SdCard();
   srv = new WebGuiServer();
   sc = new Screen(SCREEN_ADDRESS, SCREEN_WIDTH, SCREEN_HEIGHT, OLED_RESET, &Wire);
   th = new Thermometer(ONE_WIRE_BUS);
@@ -86,7 +89,11 @@ void loop()
   Serial.println(bufMessage);
   sc->write((char *)bufMessage);
 
-  cnf->printConfiguration();
+  // cnf->printConfiguration();
+  if (!sd->isCardPresent())
+  {
+    Serial.println("SD Card not present.");
+  }
   delay(100);
 }
 
